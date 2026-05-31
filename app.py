@@ -5,6 +5,7 @@ import streamlit as st
 
 from sotl.config import settings
 from sotl.data import load_models
+from sotl.recommend import recommend
 from sotl.theme import THEME_CSS
 
 st.set_page_config(page_title="State of the LLMs", layout="wide")
@@ -36,7 +37,25 @@ def beat_scatter(df):
 
 def beat_picker(df):
     st.header("② Pick a model")
-    st.info("Built in a later task.")
+    c1, c2, c3 = st.columns(3)
+    task = c1.selectbox("Task", ["coding", "general / reasoning"])
+    budget = c2.slider("Max $ / 1M output tokens", 0.5, 30.0, 10.0, 0.5)
+    prefer_eff = c3.toggle("Prefer faster/cheaper on ties", value=True)
+    rec = recommend(
+        df,
+        task="coding" if task == "coding" else "general",
+        max_price_out=budget,
+        prefer_efficient=prefer_eff,
+    )
+    if rec.pick is None:
+        st.warning("No model fits that budget — raise the slider.")
+        return
+    st.success(f"**Pick: {rec.pick}** — best {rec.score_col} at ≤ ${budget:.1f}/1M out")
+    with st.expander("Show the math", expanded=True):
+        st.dataframe(
+            rec.reason_rows[["name", "lab", "price_out", rec.score_col]],
+            use_container_width=True, hide_index=True,
+        )
 
 
 def beat_finale(df):
