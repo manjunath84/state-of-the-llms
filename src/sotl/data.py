@@ -11,6 +11,9 @@ MODEL_REQUIRED = [
 
 
 def load_models(path: Path) -> pd.DataFrame:
+    # Validation is column-PRESENCE only (right altitude for Week 1). Numeric cells
+    # may be non-parseable (e.g. "unknown"); downstream callers coerce with
+    # pd.to_numeric(errors="coerce") + dropna rather than failing the whole load.
     df = pd.read_csv(path)
     missing = [c for c in MODEL_REQUIRED if c not in df.columns]
     if missing:

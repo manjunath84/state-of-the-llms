@@ -26,3 +26,23 @@ def test_coding_per_dollar_picks_best_ratio():
 def test_context_leaders_orders_by_window():
     res = run_chip("context_leaders", _df())
     assert res.frame.iloc[0]["name"] == "B"
+
+
+def _all_unknown_df():
+    # every metric cell is non-numeric — the degenerate case real data can hit
+    return pd.DataFrame([
+        {"name": "A", "lab": "OpenAI", "price_out": "unknown", "swe_bench": "unknown",
+         "context_window": "unknown", "metric_notes": "", "params": "x"},
+    ])
+
+
+def test_coding_per_dollar_empty_metric_does_not_crash():
+    res = run_chip("coding_per_dollar", _all_unknown_df())
+    assert res.frame.empty
+    assert "No models" in res.headline
+
+
+def test_context_leaders_empty_metric_does_not_crash():
+    res = run_chip("context_leaders", _all_unknown_df())
+    assert res.frame.empty
+    assert "No models" in res.headline
