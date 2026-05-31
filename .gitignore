@@ -1,0 +1,13 @@
+.DS_Store
+__pycache__/
+*.pyc
+.venv/
+.env
+*.egg-info/
+.ruff_cache/
+.pytest_cache/
+dist/
+.cache/
+# Guardrail #4: never commit raw personal logs
+raw-logs/
+*.jsonl
