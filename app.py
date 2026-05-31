@@ -4,17 +4,28 @@ import plotly.express as px
 import streamlit as st
 
 from sotl.config import settings
-from sotl.data import load_models
+from sotl.data import load_models, load_usage
 from sotl.recommend import recommend
 from sotl.theme import THEME_CSS
+from sotl.usage import by_model as usage_by_model
+from sotl.usage import total_spend
 
 st.set_page_config(page_title="State of the LLMs", layout="wide")
 st.markdown(THEME_CSS, unsafe_allow_html=True)
+
+# Set to your actual flat Claude subscription price (e.g. 20 / 100 / 200).
+MONTHLY_PLAN_USD = 20
 
 
 @st.cache_data
 def _models():
     return load_models(settings.models_csv)
+
+
+@st.cache_data
+def _usage():
+    # usage.csv is already scoped to THIS Week-1 project by scripts/derive_usage.py
+    return load_usage(settings.usage_csv)
 
 
 def beat_scatter(df):
@@ -58,9 +69,31 @@ def beat_picker(df):
         )
 
 
-def beat_finale(df):
-    st.header("③ Equivalent API cost")
-    st.info("Built in a later task.")
+def beat_finale(_models_df):
+    st.header("③ Equivalent API cost — to build THIS app")
+    u = _usage()
+    total = total_spend(u)
+    bym = usage_by_model(u)
+    st.metric("Equivalent API cost to build this app (published list prices)", f"${total:,.2f}")
+    st.caption(
+        f"Built on a flat ${MONTHLY_PLAN_USD}/mo Claude plan — the tokens that built "
+        f"this very Week-1 app (brainstorm, plan, code) would cost ~${total:,.2f} at API "
+        "list prices. Token counts are real (measured from transcripts); the dollar "
+        "figure is a notional list-price conversion, **not** actual spend."
+    )
+    st.plotly_chart(
+        px.bar(bym, x="model", y="est_cost_usd",
+               labels={"est_cost_usd": "equiv. API cost ($)"}).update_layout(
+            paper_bgcolor="#FDFCEF", plot_bgcolor="#FDFCEF", font_color="#0F1419"),
+        use_container_width=True,
+    )
+    top = bym.iloc[0]["model"] if not bym.empty else "n/a"
+    st.markdown(
+        f"> **Every token that built the app you're looking at — brainstorm, plan, and "
+        f"code — would cost <mark>${total:,.2f}</mark> at API list prices** (mostly "
+        f"{top}). I built it on a flat ${MONTHLY_PLAN_USD}/mo plan.",
+        unsafe_allow_html=True,
+    )
 
 
 def main():
