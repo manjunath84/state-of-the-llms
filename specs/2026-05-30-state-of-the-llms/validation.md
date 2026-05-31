@@ -10,14 +10,15 @@ $ uv run ruff check .
 All checks passed!
 
 $ uv run pytest -q
-........................                                                  [100%]
-24 passed
+...............................                                           [100%]
+31 passed
 ```
 
 Coverage by module (unit tests over the pure core, fixtures not live data):
 `config`, `data`, `recommend`, `usage`, `chips` (incl. empty-after-coerce edge
 cases + is_open beats the notes heuristic), `narrate` (cache hit / no-key
-fallback / API-error fallback / per-model cache key), `trust`.
+fallback / API-error fallback / per-model cache key), `trust`, and
+`validate_models` (placeholder / provenance / is_open / sparse-scatter checks).
 
 ## App smoke (headless)
 
@@ -43,6 +44,8 @@ Note: open/closed classification uses an explicit, sourced `is_open` column in
 
 ## Open items before submission
 - Replace 3 placeholder rows in `data/models.csv` with ~18–20 verified models.
+  Gate it with `uv run python scripts/validate_models.py` (must exit 0 — it
+  currently fails on the seed rows by design).
 - Re-run `scripts/derive_usage.py` right before recording so the cost reflects the
   full build.
 - Pre-warm `.cache/narration.json` with a real `NARRATION_API_KEY` (clear the file
