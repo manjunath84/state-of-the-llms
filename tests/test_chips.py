@@ -7,9 +7,10 @@ from sotl.chips import CHIP_IDS, run_chip
 def _df():
     return pd.DataFrame([
         {"name": "A", "lab": "OpenAI", "price_out": 2.0, "swe_bench": 40,
-         "context_window": 128000, "metric_notes": "", "params": "x"},
+         "context_window": 128000, "is_open": "false", "metric_notes": "", "params": "x"},
         {"name": "B", "lab": "Meta", "price_out": 1.0, "swe_bench": 50,
-         "context_window": 1000000, "metric_notes": "open weights", "params": "x"},
+         "context_window": 1000000, "is_open": "true", "metric_notes": "open weights",
+         "params": "x"},
     ])
 
 
@@ -46,3 +47,21 @@ def test_context_leaders_empty_metric_does_not_crash():
     res = run_chip("context_leaders", _all_unknown_df())
     assert res.frame.empty
     assert "No models" in res.headline
+
+
+def test_open_vs_closed_uses_is_open_not_notes():
+    # A closed model whose notes mention "open-source" must classify as CLOSED:
+    # the explicit is_open column wins over the notes heuristic.
+    df = pd.DataFrame([
+        {"name": "Trap", "lab": "OpenAI", "price_out": 5.0, "swe_bench": 45,
+         "context_window": 128000, "is_open": "false",
+         "metric_notes": "competes with open-source models", "params": "x"},
+        {"name": "RealOpen", "lab": "Meta", "price_out": 0.5, "swe_bench": 50,
+         "context_window": 128000, "is_open": "true", "metric_notes": "", "params": "x"},
+    ])
+    res = run_chip("open_vs_closed", df)
+    kinds = dict(zip(res.frame["kind"], res.frame["avg_swe"], strict=True))
+    assert set(kinds) == {"open", "closed"}
+    # the trap row landed in closed (swe 45), the real open row in open (swe 50)
+    assert kinds["closed"] == 45
+    assert kinds["open"] == 50

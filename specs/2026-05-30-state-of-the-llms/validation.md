@@ -10,14 +10,14 @@ $ uv run ruff check .
 All checks passed!
 
 $ uv run pytest -q
-.................................                                         [100%]
-33 passed
+........................                                                  [100%]
+24 passed
 ```
 
 Coverage by module (unit tests over the pure core, fixtures not live data):
 `config`, `data`, `recommend`, `usage`, `chips` (incl. empty-after-coerce edge
-cases), `narrate` (cache hit / no-key fallback / API-error fallback / per-model
-cache key), `trust`.
+cases + is_open beats the notes heuristic), `narrate` (cache hit / no-key
+fallback / API-error fallback / per-model cache key), `trust`.
 
 ## App smoke (headless)
 
@@ -35,6 +35,10 @@ render, sidebar narrator + Data-Trust panel render, no traceback.
 | 5 | Config via pydantic-settings singleton | ✅ `config.py` |
 | 6 | Demo-safe (renders with no API key; cache + fallback) | ✅ `narrate.py` falls back on no-key AND API error |
 | 7 | Diverges from the Solution Kit | ✅ scatter/picker/cost vs. upload/pie/table; chips not chatbot |
+
+Note: open/closed classification uses an explicit, sourced `is_open` column in
+`models.csv` (not a notes heuristic) — a closed model whose notes mention
+"open-source" still classifies as closed.
 | 8 | Audits require evidence | ✅ this file |
 
 ## Open items before submission

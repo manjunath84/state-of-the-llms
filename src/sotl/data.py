@@ -5,7 +5,7 @@ import pandas as pd
 
 MODEL_REQUIRED = [
     "name", "lab", "release_date", "params", "context_window",
-    "price_in", "price_out", "mmlu_pro", "swe_bench", "arena_elo",
+    "price_in", "price_out", "mmlu_pro", "swe_bench", "arena_elo", "is_open",
     "source_url", "last_verified", "metric_type", "confidence", "metric_notes",
 ]
 

@@ -27,7 +27,7 @@ Quality gates:
 
 ```bash
 uv run ruff check .
-uv run pytest -q          # 33 tests
+uv run pytest -q          # 24 tests
 ```
 
 The app **renders fully with no API key** — narration falls back to the computed

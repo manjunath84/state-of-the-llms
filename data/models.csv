@@ -1,4 +1,4 @@
-name,lab,release_date,params,context_window,price_in,price_out,mmlu_pro,swe_bench,arena_elo,source_url,last_verified,metric_type,confidence,metric_notes
-GPT-4o,OpenAI,2024-05-13,unknown,128000,2.5,10,74.7,33.2,1285,https://artificialanalysis.ai/models/gpt-4o,2026-05-31,reported_by_lab,high,SEED ROW - verify/replace before demo
-Claude 3.5 Sonnet,Anthropic,2024-10-22,unknown,200000,3,15,77.0,49.0,1268,https://artificialanalysis.ai/models/claude-35-sonnet,2026-05-31,reported_by_lab,high,SEED ROW - verify/replace before demo
-Llama 3.1 70B,Meta,2024-07-23,70000000000,128000,0.3,0.3,66.4,unknown,1206,https://llm-stats.com/models/llama-3-1-70b,2026-05-31,third_party,medium,SEED ROW - open weights - verify/replace before demo
+name,lab,release_date,params,context_window,price_in,price_out,mmlu_pro,swe_bench,arena_elo,is_open,source_url,last_verified,metric_type,confidence,metric_notes
+GPT-4o,OpenAI,2024-05-13,unknown,128000,2.5,10,74.7,33.2,1285,false,https://artificialanalysis.ai/models/gpt-4o,2026-05-31,reported_by_lab,high,SEED ROW - verify/replace before demo
+Claude 3.5 Sonnet,Anthropic,2024-10-22,unknown,200000,3,15,77.0,49.0,1268,false,https://artificialanalysis.ai/models/claude-35-sonnet,2026-05-31,reported_by_lab,high,SEED ROW - verify/replace before demo
+Llama 3.1 70B,Meta,2024-07-23,70000000000,128000,0.3,0.3,66.4,unknown,1206,true,https://llm-stats.com/models/llama-3-1-70b,2026-05-31,third_party,medium,SEED ROW - open weights - verify/replace before demo

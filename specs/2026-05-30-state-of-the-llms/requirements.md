@@ -38,8 +38,8 @@ published API list prices, what the tokens that built *this Week-1 app* would co
 - **usage.csv schema:** `date, project, task_type, model, input_tokens,
   output_tokens, cache_creation_tokens, cache_read_tokens, est_cost_usd`.
 - **models.csv schema:** `name, lab, release_date, params, context_window,
-  price_in, price_out, mmlu_pro, swe_bench, arena_elo, source_url, last_verified,
-  metric_type, confidence, metric_notes`.
+  price_in, price_out, mmlu_pro, swe_bench, arena_elo, is_open, source_url,
+  last_verified, metric_type, confidence, metric_notes`.
 
 ## Output contracts
 - `recommend(df, task, max_price_out, prefer_efficient) -> Recommendation(pick,

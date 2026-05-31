@@ -22,6 +22,13 @@ def _num(s: pd.Series) -> pd.Series:
     return pd.to_numeric(s, errors="coerce")
 
 
+def _as_bool(s: pd.Series) -> pd.Series:
+    # CSV booleans arrive as strings ("true"/"false"); normalize to real bools.
+    if s.dtype == bool:
+        return s
+    return s.astype(str).str.strip().str.lower().isin({"true", "1", "yes", "open"})
+
+
 def run_chip(chip_id: str, df: pd.DataFrame) -> ChipResult:
     d = df.copy()
     if chip_id == "coding_per_dollar":
@@ -36,8 +43,14 @@ def run_chip(chip_id: str, df: pd.DataFrame) -> ChipResult:
                     "SWE-bench pts per $/1M out")
         return ChipResult(chip_id, headline, d[cols])
     if chip_id == "open_vs_closed":
-        d["kind"] = d["metric_notes"].str.contains("open", case=False, na=False).map(
-            {True: "open", False: "closed"})
+        # Prefer the explicit, sourced is_open column (guardrail #2); only fall back
+        # to a notes heuristic for frames that lack it. The heuristic alone
+        # misclassifies a closed model whose notes merely mention "open-source".
+        if "is_open" in d.columns:
+            d["kind"] = _as_bool(d["is_open"]).map({True: "open", False: "closed"})
+        else:
+            d["kind"] = d["metric_notes"].str.contains("open", case=False, na=False).map(
+                {True: "open", False: "closed"})
         agg = d.groupby("kind", as_index=False).agg(
             avg_swe=("swe_bench", lambda s: _num(s).mean()),
             avg_price=("price_out", lambda s: _num(s).mean()))
