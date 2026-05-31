@@ -28,11 +28,11 @@ def test_load_models_missing_column_raises(tmp_path):
 
 def test_load_usage_ok(tmp_path):
     row = {c: 0 for c in USAGE_REQUIRED}
-    row.update(date="2026-05-20", project="GenAcademy", task_type="notes", model="claude-opus-4-7")
+    row.update(date="2026-05-20", project="GenAcademy", task_type="notes", model="claude-opus-4-8")
     p = tmp_path / "usage.csv"
     pd.DataFrame([row]).to_csv(p, index=False)
     df = load_usage(p)
-    assert df.loc[0, "model"] == "claude-opus-4-7"
+    assert df.loc[0, "model"] == "claude-opus-4-8"
 
 
 def test_load_usage_missing_column_raises(tmp_path):
