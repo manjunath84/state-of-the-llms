@@ -1,0 +1,7 @@
+date,project,task_type,model,input_tokens,output_tokens,cache_creation_tokens,cache_read_tokens,est_cost_usd
+2026-05-31,Week1-GenAIBuildingBlocks,Week1-GenAIBuildingBlocks,claude-opus-4-8,97156,660946,3601962,38891960,176.903
+2026-05-31,plans,plans,claude-opus-4-8,3162,1793090,821500,52595773,228.826
+2026-05-31,state-of-the-llms,state-of-the-llms,claude-haiku-4-5-20251001,95,1805,165815,753305,0.2917
+2026-05-31,state-of-the-llms,state-of-the-llms,claude-opus-4-8,117732,2065765,14337592,40725280,486.6161
+2026-05-31,state-of-the-llms,state-of-the-llms,claude-sonnet-4-6,161,11373,281747,1885077,1.7932
+2026-05-31,superpowers,superpowers,claude-opus-4-8,5015,392561,15819563,8935886,339.5379
