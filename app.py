@@ -3,18 +3,28 @@ import pandas as pd
 import plotly.express as px
 import streamlit as st
 
+from sotl.chips import CHIP_IDS, CHIP_LABELS, run_chip
 from sotl.config import settings
 from sotl.data import load_models, load_usage
+from sotl.narrate import takeaway
 from sotl.recommend import recommend
 from sotl.theme import THEME_CSS
+from sotl.trust import trust_summary
 from sotl.usage import by_model as usage_by_model
 from sotl.usage import total_spend
 
 st.set_page_config(page_title="State of the LLMs", layout="wide")
 st.markdown(THEME_CSS, unsafe_allow_html=True)
 
-# Set to your actual flat Claude subscription price (e.g. 20 / 100 / 200).
 MONTHLY_PLAN_USD = 20
+
+# Open-source narrators on the configured OpenAI-compatible endpoint (default
+# OpenRouter). The app argues open models caught up, so an open model narrates it.
+NARRATORS = {
+    "Llama 3.1 8B (open)": "meta-llama/llama-3.1-8b-instruct",
+    "Llama 3.3 70B (open)": "meta-llama/llama-3.3-70b-instruct",
+    "Qwen 2.5 7B (open)": "qwen/qwen-2.5-7b-instruct",
+}
 
 
 @st.cache_data
@@ -26,6 +36,24 @@ def _models():
 def _usage():
     # usage.csv is already scoped to THIS Week-1 project by scripts/derive_usage.py
     return load_usage(settings.usage_csv)
+
+
+def _chip_rail(df):
+    st.caption("Ask the data:")
+    cols = st.columns(len(CHIP_IDS))
+    for col, cid in zip(cols, CHIP_IDS, strict=True):
+        if col.button(CHIP_LABELS[cid], key=f"chip_{cid}", use_container_width=True):
+            st.session_state["active_chip"] = cid
+    cid = st.session_state.get("active_chip")
+    if cid and df.empty:
+        st.info("No rows in the current filter — clear a lab to see a takeaway.")
+    elif cid:
+        res = run_chip(cid, df)  # safe: df non-empty (run_chip uses .iloc[0])
+        model = st.session_state.get("narrator_model", settings.narration_model)
+        st.markdown(f"**{takeaway(cid, res.headline, settings, model=model)}**")
+        st.caption(f"narrated by `{model}`")
+        with st.expander("Show the rows behind it"):
+            st.dataframe(res.frame, use_container_width=True, hide_index=True)
 
 
 def beat_scatter(df):
@@ -44,6 +72,7 @@ def beat_scatter(df):
     )
     fig.update_layout(paper_bgcolor="#FDFCEF", plot_bgcolor="#FDFCEF", font_color="#0F1419")
     st.plotly_chart(fig, use_container_width=True)
+    _chip_rail(view)
 
 
 def beat_picker(df):
@@ -98,6 +127,20 @@ def beat_finale(_models_df):
 
 def main():
     df = _models()
+    with st.sidebar:
+        st.subheader("🗣️ Narrator")
+        choice = st.selectbox("Who writes the takeaways?", list(NARRATORS))
+        st.session_state["narrator_model"] = NARRATORS[choice]
+        st.caption(
+            "Open-source narrators via OpenRouter — the app argues open models "
+            "caught up, so an open model narrates it."
+        )
+        s = trust_summary(df)
+        st.subheader("🔒 Data Trust")
+        st.write(f"Sources verified as of **{s['oldest_verified']}** (oldest).")
+        st.write({k: int(v) for k, v in s["counts"].items()})
+        if s["missing_swe_bench"]:
+            st.warning(f"{s['missing_swe_bench']} model(s) missing SWE-bench.")
     st.title("State of the LLMs")
     st.caption("A model-selection data story · Gen Academy Week 1")
     tab1, tab2, tab3 = st.tabs(["① Price collapse", "② Pick a model", "③ Equivalent API cost"])
