@@ -62,8 +62,11 @@ right before recording so the finale reflects the full build.
   subscription, so there is no per-token bill. Beat 3 reports the *equivalent API
   cost at published list prices*, not actual spend.
 - **Every model metric carries `source_url` + `last_verified`** (guardrail #2).
-  > ⚠️ `data/models.csv` currently ships 3 placeholder rows; replace with ~18–20
-  > verified frontier models before the demo.
+  > `data/models.csv` ships **18 frontier models** (7 open / 11 closed). Gate any
+  > edit with `uv run python scripts/validate_models.py` (must exit 0).
+  > ⚠️ Rows marked `confidence,low` (models released after the assistant's
+  > knowledge cutoff) are **provisional** — reconfirm their numbers at the cited
+  > `source_url` before recording.
 
 ## How this deliberately diverges from the Week-1 Solution Kit
 

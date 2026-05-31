@@ -16,9 +16,12 @@ Beat 2 picker (+ math) · Beat 3 real-usage finale (+ recursive close) · story
 stepper · 3 chips + open-model takeaway + disk cache · theme CSS · SDD scaffold
 (this `specs/` + CLAUDE.md + pyproject + CI + unit tests) · the three deliverables.
 
-> **Data note (MUST, author action):** `data/models.csv` currently ships 3
-> placeholder rows. Replace with ~18–20 verified frontier models (each with
-> `source_url` + `last_verified`) before recording — guardrail #2.
+> **Data note:** `data/models.csv` now ships **18 frontier models** (7 open / 11
+> closed), each with `source_url` + `last_verified`; `validate_models.py` exits 0.
+> ⚠️ **Author action remaining:** rows tagged `confidence,low` (models released
+> after the assistant's knowledge cutoff — GPT-4.1, o3-mini, Gemini 2.0 Flash,
+> DeepSeek-R1, Llama 3.3 70B, Mistral Large 2) carry provisional numbers;
+> reconfirm each at its cited source before recording — guardrail #2.
 
 **SHOULD (only if ahead at the freeze):** full Data-Trust panel · counterfactual
 savings · cache-ROI view · 4th/5th chips · deploy to Streamlit Community Cloud.
