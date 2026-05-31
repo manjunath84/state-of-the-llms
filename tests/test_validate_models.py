@@ -61,8 +61,12 @@ def test_unparseable_is_open_is_flagged():
 
 
 def test_too_few_numeric_rows_is_flagged():
-    # 12 rows but only 3 with numeric mmlu_pro → scatter would be sparse
+    # 12 rows but only 3 with numeric mmlu_pro → scatter would be sparse.
+    # Cast to object first: real CSVs with "unknown" cells load the column as
+    # object dtype, and assigning a str into an int64/float64 column raises in
+    # this pandas version.
     df = _good_df(12)
+    df["mmlu_pro"] = df["mmlu_pro"].astype(object)
     df.loc[3:, "mmlu_pro"] = "unknown"
     assert any("scatter is sparse" in p for p in validate(df))
 
