@@ -1,4 +1,4 @@
 model_id,price_in_per_mtok,price_out_per_mtok,cache_read_per_mtok,cache_write_per_mtok,source_url,last_verified
-claude-opus-4-7,15,75,1.5,18.75,https://www.anthropic.com/pricing,2026-05-31
 claude-opus-4-8,15,75,1.5,18.75,https://www.anthropic.com/pricing,2026-05-31
-claude-sonnet-4-5,3,15,0.3,3.75,https://www.anthropic.com/pricing,2026-05-31
+claude-sonnet-4-6,3,15,0.3,3.75,https://www.anthropic.com/pricing,2026-05-31
+claude-haiku-4-5-20251001,1,5,0.1,1.25,https://www.anthropic.com/pricing,2026-05-31
