@@ -1,0 +1,11 @@
+# Native theme — the canonical GenAcademy palette (cream + ink + electric-yellow
+# + dark-blue). Read ONCE at server startup (no hot-reload), so restart the
+# server after editing. This sets the base; theme.py layers brutalist borders
+# and yellow accents on top.
+[theme]
+base = "light"
+primaryColor = "#1E3A5F"            # dark-blue: widget accents, links, slider, retints the multiselect chips
+backgroundColor = "#FDFCEF"         # cream paper
+secondaryBackgroundColor = "#F5F2DA"  # warm cream — joins the sidebar + boxes to the palette
+textColor = "#0F1419"               # ink
+font = "sans serif"

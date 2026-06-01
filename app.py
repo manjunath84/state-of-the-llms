@@ -88,17 +88,28 @@ def beat_scatter(df):
     plot = plot.dropna(subset=["price_out", "swe_bench", "context_window"])
     labs = sorted(plot["lab"].dropna().unique().tolist())
     picked = st.multiselect("Filter by lab", labs, default=labs)
-    view = plot[plot["lab"].isin(picked)] if picked else plot
+    view = plot[plot["lab"].isin(picked)].copy() if picked else plot.copy()
+    # Label only the story-critical extremes (cheapest + most capable + most
+    # expensive) so the mid-cluster doesn't smear into overlapping text.
+    view["label"] = ""
+    if not view.empty:
+        for idx in {view["price_out"].idxmin(), view["price_out"].idxmax(),
+                    view["swe_bench"].idxmax()}:
+            view.loc[idx, "label"] = view.loc[idx, "name"]
     fig = px.scatter(
         view, x="price_out", y="swe_bench", size="context_window",
-        color="lab", text="name", hover_name="name", log_x=True,
+        color="lab", text="label", hover_name="name", log_x=True,
         labels={"price_out": "Price — $ / 1M output tokens (log)",
                 "swe_bench": "SWE-bench Verified (%)", "lab": "Lab"},
     )
-    fig.update_traces(textposition="top center", textfont_size=11)
+    fig.update_traces(
+        textposition="top center", textfont_size=12, textfont_color="#0F1419",
+        marker=dict(line=dict(width=1.5, color="#0F1419")),
+    )
     fig.update_layout(
-        paper_bgcolor="#FDFCEF", plot_bgcolor="#FDFCEF", font_color="#0F1419",
-        margin=dict(t=10, b=0, l=0, r=0), legend_title_text="Lab",
+        paper_bgcolor="#FDFCEF", plot_bgcolor="rgba(0,0,0,0)", font_color="#0F1419",
+        margin=dict(t=20, b=0, l=0, r=0), legend_title_text="Lab",
+        xaxis=dict(gridcolor="#E8E4D0"), yaxis=dict(gridcolor="#E8E4D0"),
     )
     st.plotly_chart(fig, use_container_width=True)
     _chip_rail(view)
