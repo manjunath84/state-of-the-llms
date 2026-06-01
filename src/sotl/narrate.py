@@ -1,6 +1,7 @@
 # src/sotl/narrate.py
 import hashlib
 import json
+import re
 
 from sotl.config import Settings
 
@@ -9,6 +10,22 @@ SYSTEM = (
     "technical builder audience. Use only numbers present in the input. Never "
     "invent figures. No preamble, no markdown."
 )
+
+
+def _numbers(s: str) -> set[str]:
+    # Numeric tokens, comma-thousands stripped, trailing-zero-normalized so
+    # "80" == "80.0". Used to enforce guardrail #3: the narrator may not emit a
+    # number absent from the input it was given.
+    out = set()
+    for tok in re.findall(r"\d+(?:\.\d+)?", s.replace(",", "")):
+        out.add(str(float(tok)) if "." in tok else str(float(tok)))
+    return out
+
+
+def _faithful(summary: str, text: str) -> bool:
+    # True iff every number in `text` also appears in `summary` (number-free
+    # prose is fine). If the model invented a figure, this is False → reject it.
+    return _numbers(text) <= _numbers(summary)
 
 
 def _key(chip_id: str, model: str, summary: str) -> str:
@@ -53,6 +70,11 @@ def takeaway(
             temperature=0.3,
         )
         text = resp.choices[0].message.content.strip()
+        # Guardrail #3, mechanically enforced: if the narrator introduced any
+        # number not in the computed input, it hallucinated — reject and fall
+        # back to the deterministic headline (which is always accurate).
+        if not _faithful(summary, text):
+            text = summary
     except Exception:
         text = summary  # API/network error → demo-safe templated fallback (guardrail #6)
     cache[key] = text

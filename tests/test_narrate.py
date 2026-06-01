@@ -90,3 +90,31 @@ def test_cache_key_includes_model(tmp_path):
     b = takeaway("c4", "same summary", s,
                  model="qwen/qwen-2.5-7b-instruct", client=_FakeClient("B"))
     assert (a, b) == ("A", "B")  # distinct cache entries per narrator
+
+
+def test_hallucinated_number_is_rejected(tmp_path):
+    # guardrail #3: the narrator invents 85.2 / 67.1 (not in the input) → reject,
+    # fall back to the deterministic summary. This is the exact failure observed
+    # in the browser with Llama 3.1 8B.
+    s = _settings(tmp_path, key="or-x")
+    summary = "Open models average 80% on SWE-bench vs 81% for closed."
+    bad = "Open scores 85.2% and closed 67.1% — a huge gap."
+    out = takeaway("ovc", summary, s, client=_FakeClient(bad))
+    assert out == summary
+
+
+def test_faithful_number_use_is_kept(tmp_path):
+    # The narrator rephrases but reuses only the input's numbers → keep it.
+    s = _settings(tmp_path, key="or-x")
+    summary = "DeepSeek-V4-Flash scores 79% at $0.28 per 1M output tokens."
+    good = "At just $0.28, DeepSeek-V4-Flash already hits 79% on coding."
+    out = takeaway("cpd", summary, s, client=_FakeClient(good))
+    assert out == good
+
+
+def test_number_free_prose_is_kept(tmp_path):
+    s = _settings(tmp_path, key="or-x")
+    summary = "Open models nearly match closed on coding for a fraction of the price."
+    good = "Open weights have all but closed the coding gap, far cheaper."
+    out = takeaway("ovc2", summary, s, client=_FakeClient(good))
+    assert out == good
