@@ -27,7 +27,7 @@ Quality gates:
 
 ```bash
 uv run ruff check .
-uv run pytest -q          # 31 tests
+uv run pytest -q          # 45 tests
 ```
 
 The app **renders fully with no API key** — narration falls back to the computed
@@ -38,7 +38,7 @@ create a `.env`:
 # .env  (all optional; the app runs without any of these)
 NARRATION_API_KEY=sk-or-...                      # your OpenRouter key (default endpoint)
 # NARRATION_BASE_URL=https://openrouter.ai/api/v1  # or Groq / Together / Ollama / OpenAI
-# NARRATION_MODEL=meta-llama/llama-3.1-8b-instruct # any model on that endpoint
+# NARRATION_MODEL=deepseek/deepseek-chat           # default; any model on that endpoint
 ```
 
 Narration is provider-agnostic: it uses the `openai` SDK pointed at any
@@ -62,12 +62,14 @@ right before recording so the finale reflects the full build.
   subscription, so there is no per-token bill. Beat 3 reports the *equivalent API
   cost at published list prices*, not actual spend.
 - **Every model metric carries `source_url` + `last_verified`** (guardrail #2).
-  > `data/models.csv` ships **12 current (2026) frontier models** (3 open / 9
-  > closed), refreshed 2026-05-31 from live vendor pricing pages + llm-stats.com
-  > SWE-bench. Gate any edit with `uv run python scripts/validate_models.py`
-  > (must exit 0). Cells that couldn't be sourced for that *exact* model are left
-  > `unknown` rather than guessed (guardrail #2); `confidence,low` rows (DeepSeek
-  > V4 reasoning-tier attribution) carry a `metric_notes` caveat.
+  > `data/models.csv` ships **17 frontier models** (5 open / 12 closed), verified
+  > **2026-06-01**. **Every SWE-bench Verified score comes from one source — the
+  > independent [vals.ai](https://www.vals.ai/benchmarks/swebench) bash-only harness
+  > — so the scatter compares models apples-to-apples** rather than mixing each lab's
+  > bespoke scaffold. Pricing is from vendor pages. Gate any edit with `uv run python
+  > scripts/validate_models.py` (must exit 0). Models vals.ai hasn't scored
+  > (Claude Opus 4.1, DeepSeek-V4-Flash) are left `swe_bench,unknown` and shown in a
+  > "priced, not benchmarked" table rather than guessed onto the chart (guardrail #2).
 
 ## How this deliberately diverges from the Week-1 Solution Kit
 
