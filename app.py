@@ -83,9 +83,9 @@ def _chip_rail(df):
 def beat_scatter(df):
     st.header("① The price collapse")
     st.markdown(
-        "**The story in one line:** open models like DeepSeek now hit ~80% on real-world "
+        "**The story in one line:** open models like DeepSeek now hit ~77% on real-world "
         "coding for *pennies*, while the best closed model (Opus) leads at ~89% but costs "
-        "**~25× more** per token. Cheap is no longer weak."
+        "**~29× more** per token. On a level harness the gap is small; the price gap is huge."
     )
     st.caption(
         "Each dot is a model. X = price per 1M output tokens (log scale). "
@@ -137,8 +137,31 @@ def beat_scatter(df):
     st.caption(
         "The dashed line is the **price-for-skill frontier** — the models you "
         "can't beat on both price and coding skill at once. Dots below/right of "
-        "it are dominated: something else is cheaper *and* better."
+        "it are dominated: something else is cheaper *and* better. "
+        "All SWE-bench scores are vals.ai's independent bash-only harness, so every dot "
+        "is measured the same way."
     )
+    # Priced but not independently benchmarked: an honest home for models vals.ai
+    # hasn't scored yet, so they're disclosed rather than guessed onto the chart.
+    nob = df.copy()
+    nob["_price"] = pd.to_numeric(nob["price_out"], errors="coerce")
+    nob["_swe"] = pd.to_numeric(nob["swe_bench"], errors="coerce")
+    nob = nob[nob["_price"].notna() & nob["_swe"].isna()]
+    if not nob.empty:
+        with st.expander(f"➕ {len(nob)} model(s) priced but not yet independently benchmarked"):
+            st.caption(
+                "Published price, but no vals.ai SWE-bench Verified score yet — listed "
+                "here rather than guessed onto the chart (guardrail: never invent a number)."
+            )
+            st.dataframe(
+                nob[["name", "lab", "price_out", "is_open"]],
+                use_container_width=True, hide_index=True,
+                column_config={
+                    "name": "Model", "lab": "Lab",
+                    "price_out": st.column_config.NumberColumn("$ / 1M out", format="$%.2f"),
+                    "is_open": "Open?",
+                },
+            )
     _chip_rail(view)
 
 
