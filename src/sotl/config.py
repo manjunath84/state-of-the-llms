@@ -11,7 +11,7 @@ class Settings(BaseSettings):
     # OpenRouter). Override base_url/model for Groq / Together / Ollama / OpenAI.
     narration_api_key: str | None = None  # env: NARRATION_API_KEY
     narration_base_url: str = "https://openrouter.ai/api/v1"  # env: NARRATION_BASE_URL
-    narration_model: str = "meta-llama/llama-3.1-8b-instruct"  # env: NARRATION_MODEL
+    narration_model: str = "deepseek/deepseek-chat"  # env: NARRATION_MODEL
     data_dir: Path = Path("data")
     cache_path: Path = Path(".cache/narration.json")
 

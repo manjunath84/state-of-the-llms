@@ -23,12 +23,16 @@ MONTHLY_PLAN_USD = 100
 # models caught up, so an OPEN model is the default narrator — but you can switch
 # to a closed model live and compare. Either way the narration gate (narrate.py)
 # rejects any number the model invents, so the choice is about prose, not safety.
+# Default = DeepSeek V3, a current flagship OPEN model — and itself one of the
+# "open caught up" models on the chart, so it literally narrates its own story.
+# Listed first → it's the selectbox default. Closed GPT models are offered for
+# live comparison; the narration gate keeps every option numerically honest.
 NARRATORS = {
-    "Llama 3.1 8B (open)": "meta-llama/llama-3.1-8b-instruct",
+    "DeepSeek V3 (open)": "deepseek/deepseek-chat",
+    "Qwen 2.5 72B (open)": "qwen/qwen-2.5-72b-instruct",
     "Llama 3.3 70B (open)": "meta-llama/llama-3.3-70b-instruct",
-    "Qwen 2.5 7B (open)": "qwen/qwen-2.5-7b-instruct",
-    "GPT-4o mini (closed)": "openai/gpt-4o-mini",
     "GPT-4o (closed)": "openai/gpt-4o",
+    "GPT-4o mini (closed)": "openai/gpt-4o-mini",
 }
 
 

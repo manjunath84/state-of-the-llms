@@ -11,7 +11,7 @@ def test_defaults_and_derived_paths(monkeypatch):
     # _env_file=None disables .env loading so this tests TRUE defaults — otherwise
     # a developer's local .env (real key) makes narration_api_key non-None here.
     s = Settings(data_dir=Path("data"), _env_file=None)
-    assert s.narration_model == "meta-llama/llama-3.1-8b-instruct"
+    assert s.narration_model == "deepseek/deepseek-chat"
     assert s.narration_base_url == "https://openrouter.ai/api/v1"
     assert s.narration_api_key is None
     assert s.models_csv == Path("data/models.csv")
