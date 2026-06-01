@@ -34,3 +34,17 @@ def load_usage(path: Path) -> pd.DataFrame:
     if missing:
         raise ValueError(f"usage.csv missing columns: {missing}")
     return df
+
+
+PRICING_REQUIRED = [
+    "model_id", "price_in_per_mtok", "price_out_per_mtok",
+    "cache_read_per_mtok", "cache_write_per_mtok",
+]
+
+
+def load_pricing(path: Path) -> pd.DataFrame:
+    df = pd.read_csv(path)
+    missing = [c for c in PRICING_REQUIRED if c not in df.columns]
+    if missing:
+        raise ValueError(f"pricing.csv missing columns: {missing}")
+    return df

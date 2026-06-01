@@ -4,7 +4,14 @@ from pathlib import Path
 import pandas as pd
 import pytest
 
-from sotl.data import MODEL_REQUIRED, USAGE_REQUIRED, load_models, load_usage
+from sotl.data import (
+    MODEL_REQUIRED,
+    PRICING_REQUIRED,
+    USAGE_REQUIRED,
+    load_models,
+    load_pricing,
+    load_usage,
+)
 
 
 def _write(tmp_path: Path, rows: list[dict]) -> Path:
@@ -40,3 +47,19 @@ def test_load_usage_missing_column_raises(tmp_path):
     pd.DataFrame([{"date": "2026-05-20"}]).to_csv(p, index=False)
     with pytest.raises(ValueError, match="missing columns"):
         load_usage(p)
+
+
+def test_load_pricing_ok(tmp_path):
+    row = {c: 0 for c in PRICING_REQUIRED}
+    row.update(model_id="claude-opus-4-8", price_out_per_mtok=25)
+    p = tmp_path / "pricing.csv"
+    pd.DataFrame([row]).to_csv(p, index=False)
+    df = load_pricing(p)
+    assert df.loc[0, "model_id"] == "claude-opus-4-8"
+
+
+def test_load_pricing_missing_column_raises(tmp_path):
+    p = tmp_path / "pricing.csv"
+    pd.DataFrame([{"model_id": "x"}]).to_csv(p, index=False)
+    with pytest.raises(ValueError, match="missing columns"):
+        load_pricing(p)
