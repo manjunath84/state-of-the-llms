@@ -19,7 +19,7 @@ from sotl.data import MODEL_REQUIRED
 
 MODELS = Path("data/models.csv")
 MIN_ROWS = 10          # below this the scatter looks sparse
-MIN_NUMERIC = 10       # rows that must have BOTH numeric price_out and mmlu_pro
+MIN_NUMERIC = 10       # rows that must have BOTH numeric price_out and swe_bench (scatter axes)
 PLACEHOLDER_MARKERS = ("seed row", "verify/replace", "todo", "tbd", "placeholder")
 BOOL_TRUE = {"true", "1", "yes", "open"}
 BOOL_FALSE = {"false", "0", "no", "closed"}
@@ -63,12 +63,13 @@ def validate(df: pd.DataFrame) -> list[str]:
         if is_open not in BOOL_TRUE | BOOL_FALSE:
             problems.append(f"{label}: is_open not boolean ({row.get('is_open')!r})")
 
-    # enough rows with BOTH axes numeric, or the scatter is empty/sparse
-    both = _numeric(df["price_out"]).notna() & _numeric(df["mmlu_pro"]).notna()
+    # enough rows with BOTH scatter axes numeric, or the scatter is empty/sparse.
+    # Beat 1 plots price_out (X) vs swe_bench (Y) — keep this in sync with beat_scatter.
+    both = _numeric(df["price_out"]).notna() & _numeric(df["swe_bench"]).notna()
     n_both = int(both.sum())
     if n_both < MIN_NUMERIC:
         problems.append(
-            f"only {n_both} rows have numeric price_out AND mmlu_pro; "
+            f"only {n_both} rows have numeric price_out AND swe_bench; "
             f"want >= {MIN_NUMERIC} or the scatter is sparse"
         )
 

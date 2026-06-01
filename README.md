@@ -9,8 +9,8 @@ on a real, personal proof: at published API list prices, what the tokens that bu
 *this very app* would cost.
 
 > **The three beats**
-> 1. **Price collapse** — a price-vs-MMLU-Pro scatter (bubble = context window),
->    filterable by lab, with deterministic "ask the data" chips narrated by an open LLM.
+> 1. **Price collapse** — a price-vs-SWE-bench-Verified scatter (bubble = context
+>    window), filterable by lab, with deterministic "ask the data" chips narrated by an open LLM.
 > 2. **Pick a model** — task + budget + efficiency → a recommended model and the
 >    scored candidate rows behind it.
 > 3. **Equivalent API cost** — the equivalent API list-price cost to build this app,
@@ -62,11 +62,12 @@ right before recording so the finale reflects the full build.
   subscription, so there is no per-token bill. Beat 3 reports the *equivalent API
   cost at published list prices*, not actual spend.
 - **Every model metric carries `source_url` + `last_verified`** (guardrail #2).
-  > `data/models.csv` ships **18 frontier models** (7 open / 11 closed). Gate any
-  > edit with `uv run python scripts/validate_models.py` (must exit 0).
-  > ⚠️ Rows marked `confidence,low` (models released after the assistant's
-  > knowledge cutoff) are **provisional** — reconfirm their numbers at the cited
-  > `source_url` before recording.
+  > `data/models.csv` ships **12 current (2026) frontier models** (3 open / 9
+  > closed), refreshed 2026-05-31 from live vendor pricing pages + llm-stats.com
+  > SWE-bench. Gate any edit with `uv run python scripts/validate_models.py`
+  > (must exit 0). Cells that couldn't be sourced for that *exact* model are left
+  > `unknown` rather than guessed (guardrail #2); `confidence,low` rows (DeepSeek
+  > V4 reasoning-tier attribution) carry a `metric_notes` caveat.
 
 ## How this deliberately diverges from the Week-1 Solution Kit
 

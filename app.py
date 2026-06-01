@@ -58,17 +58,20 @@ def _chip_rail(df):
 
 def beat_scatter(df):
     st.header("① The price collapse")
-    st.caption("Frontier quality is getting cheaper fast. Bubble size = context window.")
+    st.caption(
+        "Frontier coding skill is getting cheaper fast. Y = SWE-bench Verified "
+        "(real-world coding); bubble size = context window."
+    )
     labs = sorted(df["lab"].dropna().unique().tolist())
     picked = st.multiselect("Filter by lab", labs, default=labs)
     view = df[df["lab"].isin(picked)].copy() if picked else df.copy()
-    for c in ["price_out", "mmlu_pro", "context_window"]:
+    for c in ["price_out", "swe_bench", "context_window"]:
         view[c] = pd.to_numeric(view[c], errors="coerce")
-    view = view.dropna(subset=["price_out", "mmlu_pro", "context_window"])
+    view = view.dropna(subset=["price_out", "swe_bench", "context_window"])
     fig = px.scatter(
-        view, x="price_out", y="mmlu_pro", size="context_window",
+        view, x="price_out", y="swe_bench", size="context_window",
         color="lab", hover_name="name", log_x=True,
-        labels={"price_out": "$ / 1M output tokens", "mmlu_pro": "MMLU-Pro"},
+        labels={"price_out": "$ / 1M output tokens", "swe_bench": "SWE-bench Verified (%)"},
     )
     fig.update_layout(paper_bgcolor="#FDFCEF", plot_bgcolor="#FDFCEF", font_color="#0F1419")
     st.plotly_chart(fig, use_container_width=True)

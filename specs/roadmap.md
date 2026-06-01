@@ -16,12 +16,12 @@ Beat 2 picker (+ math) · Beat 3 real-usage finale (+ recursive close) · story
 stepper · 3 chips + open-model takeaway + disk cache · theme CSS · SDD scaffold
 (this `specs/` + CLAUDE.md + pyproject + CI + unit tests) · the three deliverables.
 
-> **Data note:** `data/models.csv` now ships **18 frontier models** (7 open / 11
-> closed), each with `source_url` + `last_verified`; `validate_models.py` exits 0.
-> ⚠️ **Author action remaining:** rows tagged `confidence,low` (models released
-> after the assistant's knowledge cutoff — GPT-4.1, o3-mini, Gemini 2.0 Flash,
-> DeepSeek-R1, Llama 3.3 70B, Mistral Large 2) carry provisional numbers;
-> reconfirm each at its cited source before recording — guardrail #2.
+> **Data note:** `data/models.csv` ships **12 current 2026 frontier models** (3
+> open / 9 closed), refreshed 2026-05-31 from live vendor pricing pages +
+> llm-stats.com SWE-bench. Beat-1 scatter plots **price_out vs SWE-bench Verified**
+> (the axis with dense, fully-sourced coverage); `mmlu_pro` is kept in the schema
+> for the picker's reasoning mode but filled only where sourced. Unsourceable
+> cells are `unknown`, never guessed (guardrail #2). `validate_models.py` exits 0.
 
 **SHOULD (only if ahead at the freeze):** full Data-Trust panel · counterfactual
 savings · cache-ROI view · 4th/5th chips · deploy to Streamlit Community Cloud.
