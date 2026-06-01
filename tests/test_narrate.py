@@ -2,7 +2,33 @@
 from pathlib import Path
 
 from sotl.config import Settings
-from sotl.narrate import takeaway
+from sotl.narrate import _faithful, _numbers, _tamper, gate_demo, takeaway
+
+
+def test_tamper_inflates_a_percentage_score():
+    txt, fake = _tamper("Open models average 75% on SWE-bench versus 78% for closed.")
+    assert fake == "87"  # 75 + 12, the first 50-100 number
+    assert "87%" in txt
+
+
+def test_tamper_noop_when_no_percentage():
+    src = "costs $0.87 per 1M output tokens"  # 0.87 and 1 — neither in 50-100
+    txt, fake = _tamper(src)
+    assert fake is None
+    assert txt == src
+
+
+def test_gate_demo_catches_injected_number():
+    summary = "Open models average 75% on SWE-bench versus 78% for closed."
+    d = gate_demo(summary)
+    assert d.caught
+    assert d.gated == summary  # gate falls back to the sourced truth
+    assert d.injected == "87"
+    assert d.injected not in summary  # the fabricated token isn't in the source
+    # the ungated candidate carries a number absent from the source
+    assert not _faithful(summary, d.ungated)
+    # …and the gated output is, by construction, faithful
+    assert _numbers(d.gated) <= _numbers(summary)
 
 
 class _BoomClient:

@@ -8,7 +8,7 @@ from sotl.chips import CHIP_IDS, CHIP_LABELS, run_chip
 from sotl.config import settings
 from sotl.data import load_models, load_pricing, load_usage
 from sotl.frontier import pareto_frontier
-from sotl.narrate import takeaway
+from sotl.narrate import gate_demo, takeaway
 from sotl.recommend import recommend
 from sotl.theme import THEME_CSS
 from sotl.trust import trust_summary
@@ -76,8 +76,36 @@ def _chip_rail(df):
         # parsed as LaTeX math (the same bug that garbled the finale caption).
         st.success(line.replace("$", "\\$"))
         st.caption(f"narrated by `{model}` · numbers computed in pandas, not by the model")
+        _gate_demo_panel(res.headline)
         with st.expander("Show the rows behind it"):
             st.dataframe(res.frame, use_container_width=True, hide_index=True)
+
+
+def _gate_demo_panel(summary: str):
+    # The differentiator made visible: prove the narrator can't invent a number.
+    # We deterministically inject a fabricated score, then show the SAME gate that
+    # runs on every live takeaway catching and replacing it.
+    with st.expander("🔬 How do we know the model didn't make that number up? (see the gate)"):
+        demo = gate_demo(summary)
+        st.caption(
+            "Every takeaway is checked: any number the model writes that isn't in the "
+            "computed data is rejected and replaced. To show it catching one, we hand the "
+            "gate a sentence with a **fabricated** score — the identical check runs on the "
+            "real takeaway above."
+        )
+        g1, g2 = st.columns(2)
+        with g1:
+            st.markdown("**🔓 Without the gate** — what could ship:")
+            st.error(demo.ungated.replace("$", "\\$"))
+        with g2:
+            st.markdown("**🔒 With the gate** — what actually ships:")
+            st.success(demo.gated.replace("$", "\\$"))
+        if demo.caught:
+            st.caption(
+                f"The gate found **{demo.injected}** in the sentence but not in the data, "
+                "so it rejected the line and fell back to the sourced version. No invented "
+                "number can reach the screen."
+            )
 
 
 def beat_scatter(df):
