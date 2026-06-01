@@ -164,10 +164,20 @@ def beat_scatter(df):
             font=dict(size=12, color="#0F1419"), bgcolor="#EAFF00",
             bordercolor="#0F1419", borderwidth=1.5, borderpad=2,
         )
+    # Explicit $ ticks on the log axis. Plotly's default log ticks print bare
+    # minor magnitudes ("7 8 9 1 2 3 … 10 2 3") with no $, which is unreadable —
+    # replace with a handful of labelled dollar gridlines spanning the data.
+    PRICE_TICKS = [0.25, 0.5, 1, 2, 5, 10, 20, 50]
     fig.update_layout(
         paper_bgcolor="#FDFCEF", plot_bgcolor="rgba(0,0,0,0)", font_color="#0F1419",
         margin=dict(t=20, b=0, l=0, r=0), legend_title_text="Lab",
-        xaxis=dict(gridcolor="#E8E4D0"), yaxis=dict(gridcolor="#E8E4D0"),
+        xaxis=dict(
+            gridcolor="#E8E4D0", tickfont=dict(size=13),
+            title="Price — $ per 1M output tokens · log scale · ← cheaper / pricier →",
+            tickmode="array", tickvals=PRICE_TICKS,
+            ticktext=[(f"${v:g}" if v >= 1 else f"${v:.2f}") for v in PRICE_TICKS],
+        ),
+        yaxis=dict(gridcolor="#E8E4D0", tickfont=dict(size=13)),
     )
     st.plotly_chart(fig, use_container_width=True)
     st.caption(
