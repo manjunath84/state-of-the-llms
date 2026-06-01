@@ -18,12 +18,17 @@ st.markdown(THEME_CSS, unsafe_allow_html=True)
 
 MONTHLY_PLAN_USD = 100
 
-# Open-source narrators on the configured OpenAI-compatible endpoint (default
-# OpenRouter). The app argues open models caught up, so an open model narrates it.
+# Narrators on the configured OpenAI-compatible endpoint (default OpenRouter,
+# which serves both open and closed models under one key). The app argues open
+# models caught up, so an OPEN model is the default narrator — but you can switch
+# to a closed model live and compare. Either way the narration gate (narrate.py)
+# rejects any number the model invents, so the choice is about prose, not safety.
 NARRATORS = {
     "Llama 3.1 8B (open)": "meta-llama/llama-3.1-8b-instruct",
     "Llama 3.3 70B (open)": "meta-llama/llama-3.3-70b-instruct",
     "Qwen 2.5 7B (open)": "qwen/qwen-2.5-7b-instruct",
+    "GPT-4o mini (closed)": "openai/gpt-4o-mini",
+    "GPT-4o (closed)": "openai/gpt-4o",
 }
 
 
@@ -172,9 +177,10 @@ def main():
         choice = st.selectbox("Who writes the takeaways?", list(NARRATORS))
         st.session_state["narrator_model"] = NARRATORS[choice]
         st.caption(
-            "An **open-source** model writes the one-line takeaways — fitting, since "
-            "the whole app argues open models caught up. It only narrates; the numbers "
-            "are computed in pandas."
+            "Default is an **open-source** model — fitting, since the app argues open "
+            "models caught up. Switch to a closed model (GPT) to compare the prose. "
+            "Either way it only narrates; the numbers are computed in pandas, and a "
+            "validation gate rejects any figure the model invents."
         )
         st.subheader("🔒 Data Trust")
         s = trust_summary(df)
