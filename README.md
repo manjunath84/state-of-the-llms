@@ -71,20 +71,6 @@ right before recording so the finale reflects the full build.
   > (Claude Opus 4.1, DeepSeek-V4-Flash) are left `swe_bench,unknown` and shown in a
   > "priced, not benchmarked" table rather than guessed onto the chart (guardrail #2).
 
-## How this deliberately diverges from the Week-1 Solution Kit
-
-Replicating the provided kit (a Stock Portfolio Analyzer) scores zero. Ours shares
-zero content, charts, or domain:
-
-| Solution Kit | This project |
-|---|---|
-| Upload + manual-entry transactions, infer CSV format | Ships curated `models.csv` + derived `usage.csv` — instant, no upload |
-| Pie allocation + holdings table (cost basis / quantity / profit) | Price-vs-performance **scatter** + interactive **picker** + real-usage **finale** |
-| 6-cell metric grid (XIRR, returns, proceeds…) | **One** headline metric (equivalent API cost) + a by-model bar |
-| Portfolio-value trend line over time | No time-trend lead; finale leads with by-model + the recursive row |
-| Free-text "AI Analyst" chatbot | Deterministic chips + a one-sentence **open-model** takeaway |
-| Generic finance domain | Frontier-model selection + the real token cost of building this very app |
-
 ## Architecture
 
 Pure core / thin view: all logic in `src/sotl/` (unit-tested, no `st.*`); Streamlit
