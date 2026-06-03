@@ -88,7 +88,8 @@ zero content, charts, or domain:
 ## Architecture
 
 Pure core / thin view: all logic in `src/sotl/` (unit-tested, no `st.*`); Streamlit
-only in `app.py`. Constitution in [`specs/`](specs/README.md); decisions in
+only in `app.py`. See the **[architecture diagram](docs/architecture.md)** for the data
+flow and the narration gate. Constitution in [`specs/`](specs/README.md); decisions in
 [`docs/decisions/`](docs/decisions/). Design source of truth:
 [`docs/superpowers/specs/2026-05-30-state-of-the-llms-design.md`](docs/superpowers/specs/2026-05-30-state-of-the-llms-design.md).
 
