@@ -18,6 +18,7 @@ from sotl.usage import (
     by_model_detail,
     cost_components,
     filter_scope,
+    reprice_uniform,
     total_spend,
 )
 
@@ -279,6 +280,85 @@ _COMPONENT_COLORS = {
     "Output": "#1E3A5F", "Cache read": "#888", "Input": "#d9d4b8",
 }
 
+# Friendly labels for the routing-cost question (raw model_ids → display names).
+_MODEL_PRETTY = {
+    "claude-opus-4-8": "Opus 4.8",
+    "claude-sonnet-4-6": "Sonnet 4.6",
+    "claude-haiku-4-5-20251001": "Haiku 4.5",
+}
+
+
+def _pretty_model(model_id: str) -> str:
+    return _MODEL_PRETTY.get(model_id, model_id)
+
+
+def _routing_question(u, pricing, total):
+    # Tab-3 curated question, mirroring the Tab-1 chip UX but powered by usage data.
+    # Re-prices the MEASURED token volume at each model's list rate. The honesty line:
+    # this is a rate SPREAD, not a saving — the volume is held fixed, so we never weld
+    # the multiple to "routing would save you this much" (a weaker model needs more
+    # tokens, and you wouldn't run architecture on Haiku). The lesson is stated in
+    # plain text, separate from the number.
+    st.markdown("---")
+    st.markdown("**Ask the data** — what would different models have cost?")
+    if st.button(
+        "💡 Re-price this build on each model", key="routing_q", use_container_width=True
+    ):
+        st.session_state["show_routing"] = True
+    if not st.session_state.get("show_routing"):
+        return
+
+    rep = reprice_uniform(u, pricing)  # scoped u → reconciles with the $ metric above
+    if rep.empty or rep.iloc[0]["total_cost"] == 0:
+        st.info("No token volume in the current scope to re-price.")
+        return
+
+    cheap, dear = rep.iloc[0], rep.iloc[-1]
+    spread = dear["total_cost"] / cheap["total_cost"]
+    cheap_name, dear_name = _pretty_model(cheap["model"]), _pretty_model(dear["model"])
+
+    # Deterministic, gate-safe summary: the rate-SPREAD fact only (the routing lesson
+    # is the plain caption below, NOT attached to the multiple).
+    summary = (
+        f"Priced entirely on one model, this build's token volume spans a "
+        f"{spread:.0f}x list-price range — from about ${cheap['total_cost']:,.2f} at "
+        f"{cheap_name}'s rate to ${dear['total_cost']:,.2f} at {dear_name}'s. Leaving "
+        f"Opus as the default put it near the top of that range."
+    )
+    model = st.session_state.get("narrator_model", settings.narration_model)
+    line = takeaway("efficiency_routing", summary, settings, model=model)
+    st.success(line.replace("$", "\\$"))
+    st.caption(f"narrated by `{model}` · numbers computed in pandas, not by the model")
+
+    disp = rep.copy()
+    disp["label"] = disp["model"].map(_pretty_model)
+    colors = {lbl: "#888" for lbl in disp["label"]}
+    colors[cheap_name] = "#1E3A5F"   # cheapest alternative
+    colors[dear_name] = "#EAFF00"    # where this build actually landed — highlighted
+    fig = px.bar(
+        disp, x="label", y="total_cost", color="label",
+        color_discrete_map=colors,
+        labels={"total_cost": "Equivalent API cost ($)", "label": ""},
+    )
+    fig.update_traces(marker_line_color="#0F1419", marker_line_width=1.5)
+    fig.add_hline(
+        y=total, line_dash="dash", line_color="#0F1419",
+        annotation_text=f"actual blend ${total:,.0f}", annotation_position="top left",
+    )
+    fig.update_layout(
+        paper_bgcolor="#FDFCEF", plot_bgcolor="#FDFCEF", font_color="#0F1419",
+        margin=dict(t=10, b=0, l=0, r=0), showlegend=False,
+    )
+    st.plotly_chart(fig, use_container_width=True)
+
+    st.caption(
+        "This is a list-price **counterfactual**, not a saving you could bank: it holds "
+        "the token volume fixed, and a weaker model usually needs *more* tokens — you "
+        "wouldn't run architecture on Haiku. The real lever is **routing the mechanical "
+        "share** (renames, boilerplate, simple tests) to a cheaper model while keeping "
+        "Opus for design and hard debugging."
+    )
+
 
 def beat_finale(_models_df):
     st.header("③ What did it cost to build THIS app?")
@@ -369,6 +449,8 @@ def beat_finale(_models_df):
         "close — the tool measuring AI cost, measuring itself.",
         unsafe_allow_html=True,
     )
+
+    _routing_question(u, pricing, total)
 
 
 def main():

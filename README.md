@@ -15,6 +15,8 @@ on a real, personal proof: at published API list prices, what the tokens that bu
 >    scored candidate rows behind it.
 > 3. **Equivalent API cost** — the equivalent API list-price cost to build this app,
 >    by model. Token counts are real; the dollar figure is notional (see *Provenance*).
+>    A "what would different models have cost?" question re-prices the measured token
+>    volume on each model — a list-price *rate spread* (≈5×), not bankable savings.
 
 ## Run it
 
