@@ -64,6 +64,27 @@ def cost_components(usage_df: pd.DataFrame, pricing_df: pd.DataFrame) -> pd.Data
     return pd.DataFrame(rows)
 
 
+def reprice_uniform(usage_df: pd.DataFrame, pricing_df: pd.DataFrame) -> pd.DataFrame:
+    # Counterfactual: take the *measured* token volume and re-price the WHOLE of it
+    # at each model's four list rates — i.e. "what if every token had run on this
+    # one model". This is a list-price re-pricing, not achievable savings: the token
+    # volume is held fixed (a weaker model would likely need more), so it reads as a
+    # rate SPREAD, not a routing saving. Cheapest first. Columns: model, total_cost.
+    tok = {tok_col: usage_df[tok_col].sum() for _, tok_col, _ in _COMPONENTS}
+    rows = []
+    for r in pricing_df.itertuples(index=False):
+        cost = sum(
+            tok[tok_col] / 1e6 * getattr(r, price_col)
+            for _, tok_col, price_col in _COMPONENTS
+        )
+        rows.append({"model": r.model_id, "total_cost": round(float(cost), 2)})
+    return (
+        pd.DataFrame(rows)
+        .sort_values("total_cost")
+        .reset_index(drop=True)
+    )
+
+
 def by_task(df: pd.DataFrame) -> pd.DataFrame:
     return (
         df.groupby("task_type", as_index=False)["est_cost_usd"].sum()
