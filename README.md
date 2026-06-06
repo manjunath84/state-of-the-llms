@@ -1,5 +1,9 @@
 # State of the LLMs
 
+[![Open in Streamlit](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://state-of-the-llms.streamlit.app/)
+
+**🔗 Live demo → https://state-of-the-llms.streamlit.app/**
+
 A vibe-coded, CSV-backed **Streamlit** data app — a *model-selection data story* for
 builders. Gen Academy "Mastering Agentic AI Bootcamp", Week 1 project.
 
